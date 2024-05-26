@@ -10,12 +10,15 @@ import { useEffect, useState } from "react";
 import "react-native-reanimated";
 
 import { useColorScheme } from "@/hooks/useColorScheme";
-import { getAuth, onAuthStateChanged } from "firebase/auth";
-import { Pressable, TextInput, View } from "react-native";
-import { ThemedText } from "@/components/ThemedText";
+import {
+  getAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+} from "firebase/auth";
+import { ActivityIndicator, View } from "react-native";
 import { Colors } from "@/constants/Colors";
-import { GestureHandlerRootView } from "react-native-gesture-handler";
-import { HelloWave } from "@/components/HelloWave";
+import LoginForm from "@/components/authForm/LoginForm";
+import RegisterForm from "@/components/authForm/RegisterForm";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -27,25 +30,53 @@ export default function RootLayout() {
   });
   const [authUser, setAuthUser] = useState({});
   const [loading, setLoading] = useState(true);
+  //true: register
+  //false: login
+  const [authType, setAuthType] = useState(false);
+  const [formEmail, setFormEmail] = useState("");
+  const [formPassword, setFormPassword] = useState("");
 
   const auth = getAuth();
 
-  onAuthStateChanged(auth, (user) => {
-    if (user) {
-      setAuthUser(user);
-      const uid = user.uid;
-      console.log(uid);
-    } else {
-      console.log("user signed out!");
+  const toggleAuthType = () => {
+    setAuthType(!authType);
+    setFormEmail("");
+    setFormPassword("");
+  };
+
+  const handleAuth = (mode: string) => {
+    if (mode == "login") {
+      signInWithEmailAndPassword(auth, formEmail, formPassword)
+        .then((userCredential) => {
+          // Signed in
+          const user = userCredential.user;
+          console.log(user);
+          // ...
+        })
+        .catch((error) => {
+          const errorCode = error.code;
+          const errorMessage = error.message;
+          console.log(`${errorCode}: ${errorMessage}`);
+        });
     }
-    // setLoading(false);
-  });
+  };
 
   useEffect(() => {
     if (loaded) {
       SplashScreen.hideAsync();
     }
-  }, [loaded]);
+
+    const unsubscribe = onAuthStateChanged(auth, (user) => {
+      if (user) {
+        setAuthUser(user);
+      } else {
+        setAuthUser({});
+      }
+      setLoading(false);
+    });
+
+    return () => unsubscribe(); // Cleanup subscription on unmount
+  }, [loaded, auth]);
 
   if (!loaded) {
     return null;
@@ -54,81 +85,83 @@ export default function RootLayout() {
   return (
     <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
       {!loading ? (
-        <Stack>
-          <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-          <Stack.Screen name="+not-found" />
-        </Stack>
+        <>
+          {authUser.hasOwnProperty("uid") ? (
+            <Stack>
+              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+              <Stack.Screen name="+not-found" />
+            </Stack>
+          ) : (
+            <View
+              style={{
+                backgroundColor: Colors.dark.background,
+                width: "100%",
+                height: "100%",
+                paddingTop: 40,
+                paddingHorizontal: 60,
+                gap: 20,
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              {/* <View
+                style={{
+                  display: "flex",
+                  flexDirection: "row",
+                  justifyContent: "center",
+                  alignItems: "center",
+                  gap: 10,
+                }}
+              >
+                <ThemedText
+                  type="subtitle"
+                  style={{ opacity: authType ? 0.2 : 1 }}
+                >
+                  Logueo
+                </ThemedText>
+                <Switch onValueChange={toggleAuthType} value={authType} />
+                <ThemedText
+                  type="subtitle"
+                  style={{ opacity: !authType ? 0.2 : 1 }}
+                >
+                  Registro
+                </ThemedText>
+              </View> */}
+              {authType ? (
+                <RegisterForm
+                  email={formEmail}
+                  handleEmail={setFormEmail}
+                  password={formPassword}
+                  handlePassword={setFormPassword}
+                  handleButton={() => {
+                    handleAuth("register");
+                  }}
+                />
+              ) : (
+                <LoginForm
+                  email={formEmail}
+                  handleEmail={setFormEmail}
+                  password={formPassword}
+                  handlePassword={setFormPassword}
+                  handleButton={() => {
+                    handleAuth("login");
+                  }}
+                />
+              )}
+            </View>
+          )}
+        </>
       ) : (
         <View
           style={{
-            backgroundColor: Colors.dark.background,
+            flex: 1,
+            justifyContent: "center",
+            alignItems: "center",
             width: "100%",
             height: "100%",
-            paddingTop: 40,
-            paddingHorizontal: 60,
           }}
         >
-          <View
-            style={{
-              display: "flex",
-              flexDirection: "row",
-              justifyContent: "center",
-            }}
-          >
-            <ThemedText type="title">Autenticación</ThemedText>
-          </View>
-          <View
-            style={{
-              width: "100%",
-              height: "100%",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              gap: 15,
-            }}
-          >
-            <TextInput
-              placeholder="Correo"
-              textContentType="emailAddress"
-              keyboardType="email-address"
-              inputMode="email"
-              style={{
-                borderWidth: 1,
-                borderColor: Colors.dark.icon,
-                padding: 10,
-                width: "100%",
-              }}
-            />
-            <TextInput
-              placeholder="Contraseña"
-              secureTextEntry
-              textContentType="password"
-              keyboardType="visible-password"
-              inputMode="text"
-              style={{
-                borderWidth: 1,
-                borderColor: Colors.dark.icon,
-                padding: 10,
-                width: "100%",
-              }}
-            />
-            <Pressable
-              style={({ pressed }) => [
-                {
-                  backgroundColor: pressed
-                    ? Colors.light.text
-                    : Colors.light.tint,
-                  borderRadius: 5,
-                  padding: 7,
-                  width: "100%",
-                },
-              ]}
-            >
-              <ThemedText type="subtitle" style={{ textAlign: "center" }}>
-                Iniciar sesión
-              </ThemedText>
-            </Pressable>
-          </View>
+          <ActivityIndicator size="large" />
         </View>
       )}
     </ThemeProvider>
