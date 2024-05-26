@@ -34,6 +34,7 @@ export default function LoginForm({
         keyboardType="email-address"
         inputMode="email"
         style={{
+          color: "white",
           borderWidth: 1,
           borderColor: Colors.dark.icon,
           padding: 10,
@@ -49,6 +50,7 @@ export default function LoginForm({
         keyboardType="visible-password"
         inputMode="text"
         style={{
+          color: "white",
           borderWidth: 1,
           borderColor: Colors.dark.icon,
           padding: 10,

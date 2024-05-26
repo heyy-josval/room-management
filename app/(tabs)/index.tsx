@@ -1,7 +1,8 @@
-import { View, Text, ActivityIndicator, Pressable } from "react-native";
+import { View, ActivityIndicator, Pressable } from "react-native";
+
+import { SafeAreaView } from "react-native-safe-area-context";
 
 import { ThemedText } from "@/components/ThemedText";
-import { ThemedView } from "@/components/ThemedView";
 import { database } from "@/firebaseConfig";
 import { child, get, onValue, ref, set } from "firebase/database";
 import { useEffect, useState } from "react";
@@ -38,7 +39,7 @@ export default function HomeScreen() {
   }, []); // Empty dependency array means this runs once when the component mounts
 
   return (
-    <View
+    <SafeAreaView
       style={{
         padding: 20,
         width: "100%",
@@ -96,6 +97,6 @@ export default function HomeScreen() {
           <ActivityIndicator size="large" />
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

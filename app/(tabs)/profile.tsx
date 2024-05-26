@@ -4,6 +4,7 @@ import { ThemedText } from "@/components/ThemedText";
 import { useEffect, useState } from "react";
 import { getAuth, onAuthStateChanged, signOut } from "firebase/auth";
 import { Colors } from "@/constants/Colors";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 export default function ProfileScreen() {
   const [user, setUser] = useState<Record<string, any>>({});
@@ -29,7 +30,7 @@ export default function ProfileScreen() {
     }
   });
   return (
-    <View
+    <SafeAreaView
       style={{
         padding: 20,
       }}
@@ -71,6 +72,6 @@ export default function ProfileScreen() {
           <ActivityIndicator size="large" />
         </View>
       )}
-    </View>
+    </SafeAreaView>
   );
 }

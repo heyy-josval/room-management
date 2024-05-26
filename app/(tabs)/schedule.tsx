@@ -2,6 +2,7 @@ import { View } from "react-native";
 import { useState } from "react";
 import { Calendar, LocaleConfig } from "react-native-calendars";
 import { ThemedText } from "@/components/ThemedText";
+import { SafeAreaView } from "react-native-safe-area-context";
 
 LocaleConfig.locales["pe"] = {
   monthNames: [
@@ -50,7 +51,7 @@ LocaleConfig.defaultLocale = "pe";
 export default function ScheduleScreen() {
   const [selected, setSelected] = useState("");
   return (
-    <View
+    <SafeAreaView
       style={{
         padding: 20,
       }}
@@ -70,6 +71,6 @@ export default function ScheduleScreen() {
         }}
       />
       <ThemedText>"Horario" Proximamente</ThemedText>
-    </View>
+    </SafeAreaView>
   );
 }

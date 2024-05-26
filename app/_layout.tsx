@@ -19,6 +19,7 @@ import { ActivityIndicator, View } from "react-native";
 import { Colors } from "@/constants/Colors";
 import LoginForm from "@/components/authForm/LoginForm";
 import RegisterForm from "@/components/authForm/RegisterForm";
+import { SafeAreaProvider, SafeAreaView } from "react-native-safe-area-context";
 
 // Prevent the splash screen from auto-hiding before asset loading is complete.
 SplashScreen.preventAutoHideAsync();
@@ -83,28 +84,29 @@ export default function RootLayout() {
   }
 
   return (
-    <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
-      {!loading ? (
-        <>
-          {authUser.hasOwnProperty("uid") ? (
-            <Stack>
-              <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
-              <Stack.Screen name="+not-found" />
-            </Stack>
-          ) : (
-            <View
-              style={{
-                backgroundColor: Colors.dark.background,
-                width: "100%",
-                height: "100%",
-                paddingTop: 40,
-                paddingHorizontal: 60,
-                gap: 20,
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              {/* <View
+    <SafeAreaProvider>
+      <ThemeProvider value={colorScheme === "dark" ? DarkTheme : DefaultTheme}>
+        {!loading ? (
+          <>
+            {authUser.hasOwnProperty("uid") ? (
+              <Stack>
+                <Stack.Screen name="(tabs)" options={{ headerShown: false }} />
+                <Stack.Screen name="+not-found" />
+              </Stack>
+            ) : (
+              <View
+                style={{
+                  backgroundColor: Colors.dark.background,
+                  width: "100%",
+                  height: "100%",
+                  paddingTop: 40,
+                  paddingHorizontal: 60,
+                  gap: 20,
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                {/* <View
                 style={{
                   display: "flex",
                   flexDirection: "row",
@@ -127,43 +129,44 @@ export default function RootLayout() {
                   Registro
                 </ThemedText>
               </View> */}
-              {authType ? (
-                <RegisterForm
-                  email={formEmail}
-                  handleEmail={setFormEmail}
-                  password={formPassword}
-                  handlePassword={setFormPassword}
-                  handleButton={() => {
-                    handleAuth("register");
-                  }}
-                />
-              ) : (
-                <LoginForm
-                  email={formEmail}
-                  handleEmail={setFormEmail}
-                  password={formPassword}
-                  handlePassword={setFormPassword}
-                  handleButton={() => {
-                    handleAuth("login");
-                  }}
-                />
-              )}
-            </View>
-          )}
-        </>
-      ) : (
-        <View
-          style={{
-            flex: 1,
-            justifyContent: "center",
-            alignItems: "center",
-            width: "100%",
-            height: "100%",
-          }}
-        >
-          <ActivityIndicator size="large" />
-        </View>
-      )}
-    </ThemeProvider>
+                {authType ? (
+                  <RegisterForm
+                    email={formEmail}
+                    handleEmail={setFormEmail}
+                    password={formPassword}
+                    handlePassword={setFormPassword}
+                    handleButton={() => {
+                      handleAuth("register");
+                    }}
+                  />
+                ) : (
+                  <LoginForm
+                    email={formEmail}
+                    handleEmail={setFormEmail}
+                    password={formPassword}
+                    handlePassword={setFormPassword}
+                    handleButton={() => {
+                      handleAuth("login");
+                    }}
+                  />
+                )}
+              </View>
+            )}
+          </>
+        ) : (
+          <SafeAreaView
+            style={{
+              flex: 1,
+              justifyContent: "center",
+              alignItems: "center",
+              width: "100%",
+              height: "100%",
+            }}
+          >
+            <ActivityIndicator size="large" />
+          </SafeAreaView>
+        )}
+      </ThemeProvider>
+    </SafeAreaProvider>
   );
 }

@@ -7,7 +7,7 @@ import { useFonts } from "expo-font";
 import { Stack } from "expo-router";
 import * as SplashScreen from "expo-splash-screen";
 import { useEffect, useState } from "react";
-import { useColorScheme } from "@/hooks/useColorScheme";
+import { useColorScheme } from "react-native";
 import { getAuth, onAuthStateChanged } from "firebase/auth";
 import { ActivityIndicator, Pressable, TextInput, View } from "react-native";
 import { ThemedText } from "@/components/ThemedText";
